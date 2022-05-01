@@ -7,26 +7,16 @@ import com.healthconnect.platform.enums.UserType;
 public class BaseAccessDto {
 
 	@NotEmpty(message = "{emailOrPhone.empty.error}")
-	private String emailOrPhone;
-
-	private long platformId;
+	private String email;
 
 	private UserType userType;
 
-	public String getEmailOrPhone() {
-		return emailOrPhone;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setEmailOrPhone(String emailOrPhone) {
-		this.emailOrPhone = emailOrPhone;
-	}
-
-	public long getPlatformId() {
-		return platformId;
-	}
-
-	public void setPlatformId(long platformId) {
-		this.platformId = platformId;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public UserType getUserType() {

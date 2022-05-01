@@ -1,11 +1,10 @@
 package com.healthconnect.platform.webapp.job;
 
-//import com.healthconnect.platform.dto.common.OutboxJob;
-import com.healthconnect.platform.entity.core.User;
+import com.healthconnect.platform.dto.common.OutboxJob;
 
 public interface HealthConnectJobService {
 
-    //void addOutboxJob(OutboxJob outboxJob);
+    void addOutboxJob(OutboxJob outboxJob);
 
     void clearMedicoPendingJobs();
 }

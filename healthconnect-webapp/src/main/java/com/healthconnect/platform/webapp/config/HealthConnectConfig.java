@@ -5,6 +5,8 @@ package com.healthconnect.platform.webapp.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
@@ -56,6 +58,7 @@ public class HealthConnectConfig implements WebMvcConfigurer {
     public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.registerModule(new JavaTimeModule());
 
         MappingJackson2HttpMessageConverter converter
                 = new MappingJackson2HttpMessageConverter(mapper);
@@ -87,8 +90,8 @@ public class HealthConnectConfig implements WebMvcConfigurer {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("manjulatha98@gmail.com");
-        mailSender.setPassword("latha_vajhala");
+        mailSender.setUsername("healthconnectdev2022@gmail.com");
+        mailSender.setPassword("Dwayne#72");
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");

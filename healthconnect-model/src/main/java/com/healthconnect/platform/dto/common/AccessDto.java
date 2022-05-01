@@ -7,18 +7,16 @@ public class AccessDto extends BaseAccessDto {
 	@NotEmpty(message = "{password.empty.error}")
 	private String password;
 
-	private String otp;
+	//private String otp;
 
 	public String getPassword() {
 		return password;
 	}
 
-	public String getOtp() {
-		return otp;
-	}
-
-	public void setOtp(String otp) {
-		this.otp = otp;
-	}
+	/*
+	 * public String getOtp() { return otp; }
+	 * 
+	 * public void setOtp(String otp) { this.otp = otp; }
+	 */
 }
 

@@ -34,18 +34,10 @@ public class Address extends BaseEntity {
 	@Column(name ="Pin")
 	private String  pinCode;
 	
-	@Column(name ="Lat")
-	private Double lat;
-	
-	@Column(name ="Lng")
-	private Double lng;
 	
 	@Column(name ="Locality")
 	private String locality;
 
-	/*
-	 * @OneToOne private Hospital hospital;
-	 */
 	public String getCountry() {
 		return country;
 	}
@@ -94,21 +86,6 @@ public class Address extends BaseEntity {
 		this.pinCode = pinCode;
 	}
 
-	public Double getLat() {
-		return lat;
-	}
-
-	public void setLat(Double lat) {
-		this.lat = lat;
-	}
-
-	public Double getLng() {
-		return lng;
-	}
-
-	public void setLng(Double lng) {
-		this.lng = lng;
-	}
 
 	public String getLocality() {
 		return locality;
@@ -117,12 +94,6 @@ public class Address extends BaseEntity {
 	public void setLocality(String locality) {
 		this.locality = locality;
 	}
-
-	/*
-	 * public Hospital getHospital() { return hospital; }
-	 * 
-	 * public void setHospital(Hospital hospital) { this.hospital = hospital; }
-	 */
 
 	public String getFullAddress() {
 		return fullAddress;
@@ -136,8 +107,6 @@ public class Address extends BaseEntity {
 		AddressDto addressDto  = new AddressDto(this.locality,this.city,this.pinCode);
 		addressDto.setCountry(this.country);
 		addressDto.setFullAddress(this.fullAddress);
-		addressDto.setLng(this.lng);
-		addressDto.setLat(this.lat);
 		return addressDto;
 	}
 }

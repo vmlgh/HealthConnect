@@ -1,0 +1,46 @@
+package com.healthconnect.platform.entity.common;
+
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.*;
+
+import com.healthconnect.platform.entity.core.BaseEntity;
+
+@Entity
+@Table(name ="SpecialityMaster")
+public class SpecialityMaster extends BaseEntity {
+
+	@Column(name ="Name", unique = true)
+	private String name;
+	
+	@Column(name ="Description")
+	private String description;
+	
+	@OneToMany(fetch = FetchType.EAGER,mappedBy ="specialityMaster")
+	private Set<SubSpecialityMaster> subSpecialityMasters;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Set<SubSpecialityMaster> getSubSpecialityMasters() {
+		return subSpecialityMasters;
+	}
+
+	public void setSubSpecialityMasters(Set<SubSpecialityMaster> subSpecialityMasters) {
+		this.subSpecialityMasters = subSpecialityMasters;
+	}
+}

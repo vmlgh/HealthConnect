@@ -25,12 +25,6 @@ public class AddressDto {
 	@NotNull(message="{address.pincode.null.error}")
 	private String pinCode;
 
-	@NotNull(message="{address.latitude.null.error}")
-	private Double lat;
-
-	@NotNull(message="{address.longitude.null.error}")
-	private Double lng;
-
 	private String locality;
 
 	public AddressDto(String locality, String city, String pinCode) {
@@ -81,22 +75,6 @@ public class AddressDto {
 
 	public void setPinCode(String pinCode) {
 		this.pinCode = pinCode;
-	}
-
-	public Double getLat() {
-		return lat;
-	}
-
-	public void setLat(Double lat) {
-		this.lat = lat;
-	}
-
-	public Double getLng() {
-		return lng;
-	}
-
-	public void setLng(Double lng) {
-		this.lng = lng;
 	}
 
 	public String getLocality() {

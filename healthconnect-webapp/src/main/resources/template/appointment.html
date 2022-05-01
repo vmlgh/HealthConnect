@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<table width="692" height="801" align="center" cellpadding="0" cellspacing="0" border="0"
+    
+    <tr>
+        <td height="30" align="left" valign="top" style="line-height:0px;">
+        </td>
+    </tr>
+    <tr>
+        <td align="center" valign="top" style="line-height:0px;padding:50px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,228,172,0.7);
+                           border-radius:40px;
+                           -moz-border-radius:40px;
+                           -webkit-border-radius:40px;
+                           -o-border-radius:40px;">
+                <tr>
+                    <td width="100%" height="430" align="left" valign="top"
+                        style="padding:50px;color:#000;font-size:17px;">
+                        <span th:text="'Dear User'"></span>
+                        <p style="line-height:20px;padding-top:25px;">
+                            Thank you for using HealthConnect.
+                        </p>
+                        <p style="line-height:20px;padding-top:25px;">
+                            Your appointment is scheduled with Dr. <span th:text="${physician.user.firstName}"></span> specialized in <span th:text="${physician.speciality.name}"></span>.
+                        </p>
+                        <p style="line-height:20px;padding-top:25px;">
+                            Please join the video link during the booked slot <span><strong th:text="${appointment.slot}"></strong>pm</span> on <span><strong th:text="${appointment.appointmentDate}"></strong></span>.
+                        </p>
+                        <p style="line-height:20px;padding-top:25px;">
+                            Best regards, <br/>
+                            HealthConnect Team
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

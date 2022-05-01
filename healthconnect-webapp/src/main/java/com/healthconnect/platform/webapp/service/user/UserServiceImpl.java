@@ -8,21 +8,26 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.healthconnect.platform.common.CryptoUtility;
 import com.healthconnect.platform.common.StringUtil;
 import com.healthconnect.platform.dto.common.AccessDto;
+import com.healthconnect.platform.dto.common.OutboxJob;
+import com.healthconnect.platform.dto.user.AppLoginResponse;
 import com.healthconnect.platform.dto.user.UserSignUpResponse;
 import com.healthconnect.platform.entity.core.Role;
 import com.healthconnect.platform.entity.core.User;
 import com.healthconnect.platform.enums.OtpType;
+import com.healthconnect.platform.enums.OutboxJobType;
 import com.healthconnect.platform.enums.RoleType;
 import com.healthconnect.platform.enums.UserStatus;
 import com.healthconnect.platform.enums.UserType;
 import com.healthconnect.platform.repository.role.RoleRepository;
 import com.healthconnect.platform.util.HealthConnectUtility;
+import com.healthconnect.platform.webapp.common.ApiException;
 import com.healthconnect.platform.webapp.service.common.OtpService;
 
 @Transactional
@@ -41,20 +46,23 @@ public class UserServiceImpl extends BaseUserService implements UserService {
     @Autowired
     protected RoleRepository roleRepository;
 
+    public static final long LOGIN_MAX_ATTEMPT = 5;
+    
     @Override
     public UserSignUpResponse signUp(AccessDto accessDto) {
-    	boolean isEmail = StringUtil.checkValidEmail(accessDto.getEmailOrPhone());
+    	boolean isEmail = StringUtil.checkValidEmail(accessDto.getEmail());
     	User user = getUserByEmailOrMobileNumber(accessDto ,isEmail);
         validateIfSignUpAllowed(user);
         if(!isEmail) {
-            otpService.verifyOtp(accessDto.getEmailOrPhone(), accessDto.getOtp(), OtpType.SignUp);
+            //otpService.verifyOtp(accessDto.getEmail(), accessDto.getOtp(), OtpType.SignUp);
+        	throw new ApiException(HttpStatus.BAD_REQUEST.value(), "Please provide a valid email");
         }
         user = new User();
         if(isEmail) 
-            user.setEmail(accessDto.getEmailOrPhone());
+            user.setEmail(accessDto.getEmail());
         else 
-            user.setMobileNumber(accessDto.getEmailOrPhone());
-        user.setUsername(accessDto.getEmailOrPhone());
+        	user.setMobileNumber(accessDto.getEmail());
+        user.setUsername(accessDto.getEmail());
         user.setPassword(BCrypt.hashpw(accessDto.getPassword(), BCrypt.gensalt()));
         user.setUserType(accessDto.getUserType());
         user.setEmailVerified(false);
@@ -66,9 +74,12 @@ public class UserServiceImpl extends BaseUserService implements UserService {
         user.setAttempt(0);
         user = userRepository.save(user);
         user.setUserId(HealthConnectUtility.generateUserId(user.getRecordId(), getCharByService(user.getUserType())));
-        /*if(isEmail) {
-            jobService.addOutboxJob(new OutboxJob(OutboxJobType.WELCOME, user, getEmailVerificationLink(user.getUserId())));
-        }*/
+
+        if(isEmail) { 
+        	jobService.addOutboxJob(new OutboxJob(OutboxJobType.WELCOME,
+        			user, getEmailVerificationLink(user.getUserId()))); 
+        }
+
         UserSignUpResponse response = generateSignUpResponse(user, isEmail);
         response.setMobileVerified(!isEmail);
         //response.setProfileMasterData(generateProfileLaunchResponse(user.getUserType()));
@@ -91,7 +102,7 @@ public class UserServiceImpl extends BaseUserService implements UserService {
         }else {
             user.setEmailVerified(true);
             userRepository.save(user);
-            return "Email verified successfully. <a href='" + environment.getProperty("medicocyte.base.url") + "user/dashboard?id=" + encryptedId + "'>Click here</a> to go to your profile.";
+            return "Email verified successfully";
             //return "Email verified successfully.";
         }
     }
@@ -125,4 +136,39 @@ public class UserServiceImpl extends BaseUserService implements UserService {
         roles.add(role);
         return roles;
     }
+    
+    @Override
+    public AppLoginResponse login(AccessDto loginDto) {
+		boolean isEmail = StringUtil.checkValidEmail(loginDto.getEmail());
+		User user = getUserByEmailOrMobileNumber(loginDto, isEmail);
+		if (user == null) {
+			throw new ApiException(HttpStatus.UNAUTHORIZED.value(), "User does not exist. Sign up first");
+		}
+		boolean passwordMatch = BCrypt.checkpw(loginDto.getPassword(), user.getPassword());
+		AppLoginResponse loginResponse;
+		if (passwordMatch && user.getAttempt() <= LOGIN_MAX_ATTEMPT) {
+			if (user.isDeleted() || user.getStatus() == UserStatus.BLOCKED) {
+				throw new ApiException(HttpStatus.UNAUTHORIZED.value(),
+						"Account is blocked. Please try after some time.");
+			}
+			if (isEmail && !user.isEmailVerified()) {
+				throw new ApiException(HttpStatus.BAD_REQUEST.value(), "Please verify your email before login.");
+			}
+			loginResponse = generateUserLoginResponse(user);
+			user.setToken(loginResponse.getToken());
+			user.setAttempt(0);
+			//setDefaultOnUpdate(user, user); //what is this for?
+			userRepository.save(user);
+		} else {
+            user.setAttempt(user.getAttempt() + 1);
+			userRepository.save(user);
+			if (user.getAttempt() > LOGIN_MAX_ATTEMPT) {
+				throw new ApiException(HttpStatus.BAD_REQUEST, "Account blocked. Maximum login retry reached.");
+			}
+			throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials.");
+		}
+		return loginResponse;
+    }
+    
+    
 }
